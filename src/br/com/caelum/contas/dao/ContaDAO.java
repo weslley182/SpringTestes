@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.springframework.context.annotation.Scope;
+
 import br.com.caelum.contas.ConnectionFactory;
 import br.com.caelum.contas.modelo.Conta;
 import br.com.caelum.contas.modelo.TipoDaConta;
 
+@Scope(value = "request")
 public class ContaDAO {
 	private Connection connection;
 
@@ -100,22 +103,22 @@ public class ContaDAO {
 	}
 
 	public Conta buscaPorId(Long id) {
-
 		
 		if (id == null) {
 			throw new IllegalStateException("Id da conta nao deve ser nula.");
 		}
-
+		System.out.println("teste2");
 		try {
+			String sSql = "select * from contas where id = ?";
 			PreparedStatement stmt = this.connection
-					.prepareStatement("select * from contas where id = ?");
+					.prepareStatement(sSql);
 			stmt.setLong(1, id);
 			ResultSet rs = stmt.executeQuery();
-
+			System.out.println("teste3");
 			if (rs.next()) {
 				return populaConta(rs);
 			}
-
+			System.out.println("teste4");
 			rs.close();
 			stmt.close();
 			
@@ -147,21 +150,24 @@ public class ContaDAO {
 
 	private Conta populaConta(ResultSet rs) throws SQLException {
 		Conta conta = new Conta();
-
+		System.out.println("teste5");
 		conta.setId(rs.getLong("id"));
+		System.out.println("teste6");
 		conta.setDescricao(rs.getString("descricao"));
 		conta.setPaga(rs.getBoolean("paga"));
 		conta.setValor(rs.getDouble("valor"));
-
+		System.out.println("teste7");
 		Date data = rs.getDate("dataPagamento");
+		System.out.println("teste8");
 		if (data != null) {
+			System.out.println("test9");
 			Calendar dataPagamento = Calendar.getInstance();
 			dataPagamento.setTime(data);
 			conta.setDataPagamento(dataPagamento);
 		}
-		
+		System.out.println("teste10");
 		conta.setTipo(Enum.valueOf(TipoDaConta.class, rs.getString("tipo")));
-		
+		System.out.println(conta);
 		return conta;
 	}
 }
